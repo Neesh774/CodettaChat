@@ -48,7 +48,7 @@ def sendToAllButOne(msg, client, prefix="SERVER:"):
 clients = {}
 addresses = {}
 
-HOST = '127.0.0.1'
+HOST = '192.168.7.63'
 PORT = 33000
 BUFSIZ = 1024
 ADDR = (HOST, PORT)
