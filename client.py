@@ -125,6 +125,8 @@ def sendClientMessage(event=None):
             client_socket.close()
             return sys.exit()
         text = my_msg.get()
+        if(len(text) > 10 and len(clientMessages) == 0):
+            text = text[:9]
         my_msg.set("")
         message = canvas.create_text(0, 0, text=text, width=100, justify='left')
         bounds = canvas.bbox(message)
@@ -133,13 +135,15 @@ def sendClientMessage(event=None):
         clientMessageTextWidth = bounds[2] - bounds[0]
         clientMessageHeight = clientMessageTextHeight + 20
         clientMessageWidth = clientMessageTextWidth + 20
+        if(len(clientMessages)== 0):
+            messageHeight += 10
         canvas.create_rectangle(650-clientMessageWidth, messageHeight, 650, messageHeight + clientMessageHeight,fill = "#FAD02C", outline="#FAD02C")
         message = canvas.create_text(650 - (clientMessageWidth/2), messageHeight + (clientMessageHeight/2), text=text, width=100, justify='left')
         messageHeight += (clientMessageHeight + 20)
         canvas.config(scrollregion=(0, 0, 450, messageHeight+40))
         canvas.update()
         canvas.yview_moveto(1)
-        if(len(clientMessages) != 0):
+        if(len(clientMessages) > 3):
             chatbot_message(text)
         clientMessages.append(text)
 #-------------------------------------Sending System Message
@@ -147,7 +151,15 @@ def sendSystemMessage(text):
     global messageHeight
     sysMessage = canvas.create_text(325, messageHeight, text=text, justify="center")
     height = canvas.bbox(sysMessage)[3] - canvas.bbox(sysMessage)[1]
-    messageHeight+=(height + 20)
+    messageHeight+=(height + 10)
+    canvas.config(scrollregion=(0, 0, 450, messageHeight+40))
+    canvas.update()
+    canvas.yview_moveto(1)
+def sendWelcomeMessage(text):
+    global messageHeight
+    sysMessage = canvas.create_text(325, messageHeight, text=text, justify="center")
+    height = canvas.bbox(sysMessage)[3] - canvas.bbox(sysMessage)[1]
+    messageHeight+=(height + 30)
     canvas.config(scrollregion=(0, 0, 450, messageHeight+40))
     canvas.update()
     canvas.yview_moveto(1)
@@ -186,6 +198,8 @@ def receive():
             msg = client_socket.recv(BUFSIZ).decode("utf8")
             if(msg.startswith("SERVER:")): 
                 sendSystemMessage(msg[7:])
+            elif(msg.startswith("WELCOME:")):
+                sendWelcomeMessage(msg[8:])
             else:
                 sendUserMessage(msg)
         except OSError:  # Possibly client has left the chat.

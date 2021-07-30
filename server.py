@@ -1,7 +1,7 @@
 from socket import AF_INET, socket, SOCK_STREAM
 from threading import Thread
 
-
+import getIP
 def accept_incoming_connections():
     """Sets up handling for incoming clients."""
     while True:
@@ -15,12 +15,12 @@ def accept_incoming_connections():
 def handle_client(client):  # Takes client socket as argument.
     """Handles a single client connection."""
 
-    name = client.recv(BUFSIZ).decode("utf8")
-    welcome = 'SERVER:Welcome %s! If you ever want to quit, type {quit} to exit.' % name
+    name = client.recv(BUFSIZ).decode("utf8")[:10]
+    welcome = 'WELCOME:Welcome %(name)s! If you ever want to quit, type {quit} to exit.  There are %(numOnline)s people online right now.' % {"name": name, "numOnline": len(clients)}
     client.send(bytes(welcome, "utf8"))
     msg = "%s has joined the chat!" % name
     broadcast(bytes(msg, "utf8"))
-    clients[client] = name
+    clients[client] = name  
     while True:
         msg = client.recv(BUFSIZ)
         if msg != bytes("{quit}", "utf8"):
@@ -47,8 +47,7 @@ def sendToAllButOne(msg, client, prefix="SERVER:"):
 
 clients = {}
 addresses = {}
-
-HOST = '192.168.7.63'
+HOST = getIP.getHostIP()
 PORT = 33000
 BUFSIZ = 1024
 ADDR = (HOST, PORT)
@@ -58,7 +57,7 @@ SERVER.bind(ADDR)
 
 if __name__ == "__main__":
     SERVER.listen(5)
-    print("Waiting for connection...")
+    print("Waiting for connection at " + HOST + "...")
     ACCEPT_THREAD = Thread(target=accept_incoming_connections)
     ACCEPT_THREAD.start()
     ACCEPT_THREAD.join()
