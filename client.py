@@ -145,7 +145,7 @@ def sendClientMessage(event=None):
         canvas.config(scrollregion=(0, 0, 450, messageHeight+40))
         canvas.update()
         canvas.yview_moveto(1)
-        if(len(clientMessages) > 2):
+        if(len(clientMessages) > 0):
             chatbot_message(text)
         clientMessages.append(text)
 #-------------------------------------Sending System Message

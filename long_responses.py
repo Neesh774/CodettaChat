@@ -11,6 +11,9 @@ def unknown():
                 "I don't understand.",
                 "Excuse me?",
                 "Please try asking or saying something else.",
+                "That's interesting",
+                "Thank you for sharing",
+                "How curious..."
                 "What does that mean?"][
         random.randrange(4)]
     return response
