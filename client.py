@@ -72,15 +72,17 @@ def check_all_messages(message):
     # Responses -------------------------------------------------------------------------------------------------------
     response('Hello!', ['hello', 'hi', 'hey', 'sup', 'heyo'], single_response=True)
     response('See you!', ['bye', 'goodbye'], single_response=True)
-    response('I\'m doing fine, and you?', ['how', 'are', 'you', 'doing'], required_words=['how'])
+    response('I\'m doing fine, and you?', ['how', 'are', 'you', 'doing'], required_words=[])
     response('You\'re welcome!', ['thank', 'thanks'], single_response=True)
-    response("That's great!", ["i'm", "well", "doing", "ok", "good", "not"], required_words=[])
+    response("That's great!", ["i'm", "well", "doing", "ok", "good"], required_words=[])
+    response("Awww :(", ["i'm", "doing", "terrible", "not", "bad"], required_words=[])
     response('I am an avid enjoyer of cheese.', ['i', 'love', 'cheese'], required_words=['cheese'])
     response('I\'m a bot, but I\'m still learning.', ['i', 'am', 'a', 'bot'], required_words=['a', 'bot'])
     response('Never gonna give you up, never gonna let you down...', ['rickroll', 'rick', 'astley'], required_words=['never'])
     response("🎵WHAT IS LOVE? BABY DON'T HURT ME....DON'T HURT ME....NO MORE...🎵", ['love', 'what'], required_words=[])
     response("I loveeee puppies!", ['dog','animal','puppy', 'pet', 'puppies', "love", "like"], required_words=[])
     response("Kitties are the best!", ['kitty', 'kitties', 'cat', 'kitten', 'pet', 'animal', "I", "love", "like", "kittens"], required_words=[])
+    response("It looks great outside!", ['weather', 'outside', 'today'], required_words=['weather'])
     # Longer responses
     response(long.R_ADVICE, ['give', 'advice'], required_words=['advice'])
     response(long.R_EATING, ['what', 'you', 'eat'], required_words=['you', 'eat'])
@@ -120,13 +122,13 @@ def chatbot_message(clientText):
 def sendClientMessage(event=None):
     global messageHeight
     if(len(my_msg.get()) != 0):
-        client_socket.send(bytes(my_msg.get(), "utf8"))
         if my_msg.get() == "{quit}":
             client_socket.close()
             return sys.exit()
         text = my_msg.get()
         if(len(text) > 10 and len(clientMessages) == 0):
             text = text[:9]
+        client_socket.send(bytes(my_msg.get(), "utf8"))
         my_msg.set("")
         message = canvas.create_text(0, 0, text=text, width=100, justify='left')
         bounds = canvas.bbox(message)
@@ -143,7 +145,7 @@ def sendClientMessage(event=None):
         canvas.config(scrollregion=(0, 0, 450, messageHeight+40))
         canvas.update()
         canvas.yview_moveto(1)
-        if(len(clientMessages) > 3):
+        if(len(clientMessages) > 2):
             chatbot_message(text)
         clientMessages.append(text)
 #-------------------------------------Sending System Message
@@ -204,10 +206,6 @@ def receive():
                 sendUserMessage(msg)
         except OSError:  # Possibly client has left the chat.
             break
-
-def on_closing(event=None):
-    my_msg.set("{quit}")
-    sendSystemMessage("A user has left the chat")
 
 HOST = input('Enter host: ')
 PORT = input('Enter port: ')

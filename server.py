@@ -20,17 +20,19 @@ def handle_client(client):  # Takes client socket as argument.
     client.send(bytes(welcome, "utf8"))
     msg = "%s has joined the chat!" % name
     broadcast(bytes(msg, "utf8"))
-    clients[client] = name  
+    clients[client] = name
     while True:
-        msg = client.recv(BUFSIZ)
-        if msg != bytes("{quit}", "utf8"):
-            sendToAllButOne(msg, client, name+": ")
-        else:
-            client.send(bytes("{quit}", "utf8"))
+        try:
+            msg = client.recv(BUFSIZ)
+        except:
             client.close()
             del clients[client]
             broadcast(bytes("%s has left the chat." % name, "utf8"))
+            print("%s has disconnected" % name)
             break
+        print(msg)
+        if msg != bytes("{quit}", "utf8"):
+            sendToAllButOne(msg, client, name+": ")
 
 
 def broadcast(msg, prefix="SERVER:"):  # prefix is for name identification.
